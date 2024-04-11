@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qr Code Generator</title>
+    <link rel="stylesheet" href="QrCode.css">
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code Generator</h1>
+        <div class="image">
+            <img src="/QRCode/No-Image-Placeholder.svg.png" id="image">
+        </div>
+
+        <div class="form">
+            <input id="content" type="text" placeholder="Enter Content">
+            <div class="buttons">
+            <button class="genrate" id="btnCreate">Generate QR </button>
+            <button id="resetbtn">Reset</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let image=document.getElementById('image')
+        let content=document.getElementById('content')
+        let button=document.getElementById('btnCreate')
+        let rebutton=document.getElementById('resetbtn')
+
+        button.addEventListener('click', genrateQR)
+
+        function genrateQR(e){
+            if(content.value==''){
+                return;
+            }
+
+            let url='https://api.qrserver.com/v1/create-qr-code/?'
+            image.src=url+'?size=500x500&data='+content.value;
+        }
+
+        rebutton.addEventListener('click', reset)
+
+        function reset(e){
+            content.value='';
+            image.src="/QRCode/No-Image-Placeholder.svg.png";
+        }
+
+    </script>
+</body>
+</html>
