@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qr Code Generator</title>
+    <title>QR Code Generator</title>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -16,36 +16,75 @@
         <div class="form">
             <input id="content" type="text" placeholder="Enter Content">
             <div class="buttons">
-            <button class="genrate" id="btnCreate">Generate QR </button>
-            <button id="resetbtn">Reset</button>
+                <button class="generate" id="btnCreate">Generate QR</button>
+                <button id="resetbtn">Reset</button>
+            </div>
+            <div class="download">
+                <button id="download">Download</button>
             </div>
         </div>
     </div>
     
     <script>
-        let image=document.getElementById('image')
-        let content=document.getElementById('content')
-        let button=document.getElementById('btnCreate')
-        let rebutton=document.getElementById('resetbtn')
+        let image = document.getElementById('image');
+        let content = document.getElementById('content');
+        let generateButton = document.getElementById('btnCreate');
+        let resetButton = document.getElementById('resetbtn');
+        let downloadButton = document.getElementById('download');
 
-        button.addEventListener('click', genrateQR)
+        // Initially hide the download button
+        downloadButton.style.display = 'none';
 
-        function genrateQR(e){
-            if(content.value==''){
+        generateButton.addEventListener('click', generateQR);
+
+        function generateQR(e) {
+            if (content.value == '') {
                 return;
             }
 
-            let url='https://api.qrserver.com/v1/create-qr-code/?'
-            image.src=url+'?size=500x500&data='+content.value;
+            let url = 'https://api.qrserver.com/v1/create-qr-code/';
+            let qrImageUrl = url + '?size=500x500&data=' + encodeURIComponent(content.value); // No need to specify format
+
+            fetch(qrImageUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to generate QR code.');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Display generated QR code
+                    image.src = URL.createObjectURL(blob);
+                    // Show download button
+                    downloadButton.style.display = 'block';
+                    // Set download link
+                    downloadButton.onclick = function() {
+                        // Trigger download
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = 'qrcode.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        // Reset content and image
+                        content.value = '';
+                        image.src = 'No-Image-Placeholder.png';
+                        // Hide download button
+                        downloadButton.style.display = 'none';
+                    };
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to generate QR code.');
+                });
         }
 
-        rebutton.addEventListener('click', reset)
-
-        function reset(e){
-            content.value='';
-            image.src="No-Image-Placeholder.png";
-        }
-
+        resetButton.addEventListener('click', function() {
+            content.value = '';
+            image.src = 'No-Image-Placeholder.png';
+            // Hide download button
+            downloadButton.style.display = 'none';
+        });
     </script>
 </body>
 </html>
